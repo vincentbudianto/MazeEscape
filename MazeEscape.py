@@ -4,38 +4,45 @@
 	Tanggal   : 01 April 2019
 	Deskripsi : Source code  menggunakan strategi algoritma BFS dan A* '''
 
+from Node import *
 from colorama import *
 import queue
 
 #inisialisasi variabel global
 global maps
-global startpos
-global endpos
-global queue1
-global queue2
+global startPos
+global endPos
+global path
+global openNode
+global closedNode
 
 #inisialisasi variabel
-startpos = ()
-endpos = ()
-#queue1 = queue.Queue()
-queue2 = queue.PriorityQueue()
+startPos = Node(None, None)
+endPos = Node(None, None)
+path = []
+openNode = []
+closedNode = []
 
 def start():
-	global maps
-	global startpos
+	global startPos
 
 	for i in range(len(maps)):
 		if (maps[i][0] == 0):
-			startpos = (0, i)
+			s = (i, 0)
+	
+	startPos = Node(None, s)
+	startPos.f = heu(startPos)
 
 def end():
-	global maps
-	global endpos
+	global endPos
 	
 	for i in range(len(maps)):
 		if (maps[i][len(maps[i]) - 1] == 0):
-			endpos = (len(maps[i]) - 1, i)
+			e = (i, len(maps[i]) - 1)
 
+	endPos = Node(None, e)
+	endPos.f = heu(endPos)
+	
 def load():
 	global maps
 	
@@ -51,27 +58,78 @@ def load():
 			else:
 				maps[i][j] = 0
 	
-	start()
 	end()
+	start()
 
-def heu(x, y):
-	a = endpos[0] - x
-	b = endpos[0] - y
-	heuristic = a + b
+def heu(x):
+	a = endPos.pos[0] - x.pos[0]
+	b = endPos.pos[1] - x.pos[1]
 
-	return abs(heuristic)
+	return abs(a + b)
 
-def Astar(x, y):
-	global queue2
+def aStar():
+	global maps
+	global path
+	global openNode
+	global closedNode
+
+	curr = startPos
+	openNode.append(curr)
+
+	while openNode:
+		adj = []
+		curr = min(openNode, key = lambda n:n.f)
 	
-	if ((x == endpos[0]) and (y == endpos[0])):
-		print('A* path :')
-	else:
-		queue2.put((heu(x, y), (x, y)))
-	
+		if ((curr.pos[0] == endPos.pos[0]) and (curr.pos[1] == endPos.pos[1])):
+			while curr.prev:
+				path.append(curr)
+				curr = curr.prev
+			
+			path.append(curr)
+			
+			for i in range(len(path)):
+				maps[path[i].pos[0]][path[i].pos[1]] = 2
+			
+			break
+		
+		openNode.remove(curr)
+		closedNode.append(curr)
+		
+		for move in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+			nextNode = (curr.pos[0] + move[0], curr.pos[1] + move[1])
+			
+			if ((nextNode[0] > (len(maps) - 1)) or (nextNode[0] < 0) or (nextNode[1] > (len(maps[len(maps)-1]) -1)) or (nextNode[1] < 0)):
+				continue
+
+			if ((maps[nextNode[0]][nextNode[1]]) != 0):
+				continue
+			
+			if ((nextNode[0] == curr.pos[0]) and (nextNode[1] == curr.pos[1])):
+				continue
+			
+			newNode = Node(curr, nextNode)
+			adj.append(newNode)
+		
+		for i in range(len(adj)):
+			maps[adj[i].pos[0]][adj[i].pos[1]] = 3
+		
+		for i in adj:
+			for j in closedNode:
+				if (i == j):
+					continue
+			
+			i.f = curr.f - heu(curr) + heu(i) + 1 
+			
+			for j in openNode:
+				if ((i == j) and (i.f > j.f)):
+					continue
+			
+			openNode.append(i)
+
 def printMaze():
 	global maps
 	
+	print('Maze :')
 	print(end = ' ')
 	
 	for x in range(len(maps[len(maps) - 1]) + 4):
@@ -82,6 +140,7 @@ def printMaze():
 	for i in range(len(maps)):
 		print(' ', end = '')
 		print(Back.WHITE + '  ', end = '')
+		
 		for j in range(len(maps[i])):
 			if (maps[i][j] == 1):
 				print(Back.BLACK + ' ', end = '')
@@ -98,10 +157,10 @@ def printMaze():
 
 	print()
 
-
 def printResult():
 	global maps
 	
+	print('A* Result:')
 	print(end = ' ')
 	
 	for x in range(len(maps[len(maps) - 1]) + 4):
@@ -112,8 +171,11 @@ def printResult():
 	for i in range(len(maps)):
 		print(' ', end = '')
 		print(Back.WHITE + '  ', end = '')
+		
 		for j in range(len(maps[i])):
-			if (maps[i][j] == 2):
+			if (maps[i][j] == 3):
+				print(Back.RED + ' ', end = '')
+			elif (maps[i][j] == 2):
 				print(Back.GREEN + ' ', end = '')
 			elif (maps[i][j] == 1):
 				print(Back.BLACK + ' ', end = '')
@@ -130,9 +192,15 @@ def printResult():
 	
 	print()
 
-
 init(autoreset=True)
 load()
+
+for i in range(len(maps)):
+	print(i, end = ': ')
+	print(maps[i])
+
+print('start :', startPos.pos)
+print('end   :',endPos.pos)
 printMaze()
-print(startpos)
-print(endpos)
+aStar()
+printResult()
