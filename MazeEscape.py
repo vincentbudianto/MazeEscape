@@ -6,9 +6,11 @@
 
 from Node import *
 from colorama import *
+import os
 import queue
 
 #inisialisasi variabel global
+global filename1
 global maps
 global startPos
 global endPos
@@ -44,9 +46,13 @@ def end():
 	endPos.f = heu(endPos)
 	
 def load():
+	global filename
 	global maps
 	
-	F = open('test2.txt', 'r').read().split('\n')
+	if (not('.txt' in filename)):
+		filename += '.txt'
+	
+	F = open(filename, 'r').read().split('\n')
 	a = len(F)
 	b = len(F[0])
 	maps = [[0 for x in range (a)] for y in range(b)]
@@ -109,7 +115,7 @@ def aStar():
 			
 			newNode = Node(curr, nextNode)
 			adj.append(newNode)
-		
+
 		for i in range(len(adj)):
 			maps[adj[i].pos[0]][adj[i].pos[1]] = 3
 		
@@ -142,7 +148,11 @@ def printMaze():
 		print(Back.WHITE + '  ', end = '')
 		
 		for j in range(len(maps[i])):
-			if (maps[i][j] == 1):
+			if ((i == startPos.pos[0]) and (j == startPos.pos[1])):
+				print(Back.CYAN + ' ', end = '')
+			elif ((i == endPos.pos[0]) and (j == endPos.pos[1])):
+				print(Back.CYAN + ' ', end = '')
+			elif (maps[i][j] == 1):
 				print(Back.BLACK + ' ', end = '')
 			elif (maps[i][j] == 0):
 				print(Back.WHITE + ' ', end = '')
@@ -160,7 +170,7 @@ def printMaze():
 def printResult():
 	global maps
 	
-	print('A* Result:')
+	print('Result:')
 	print(end = ' ')
 	
 	for x in range(len(maps[len(maps) - 1]) + 4):
@@ -193,14 +203,28 @@ def printResult():
 	print()
 
 init(autoreset=True)
-load()
+valid = False
 
+while (not valid):
+	try:
+		filename = input('Masukan nama file : ')
+		valid = True
+		os.system('cls')
+	except IOError:
+		print(filename, 'Not Found')
+
+load()
+printMaze()
+aStar()
+input()
+os.system('cls')
+printResult()
+
+''' Driver:
 for i in range(len(maps)):
 	print(i, end = ': ')
 	print(maps[i])
 
 print('start :', startPos.pos)
 print('end   :',endPos.pos)
-printMaze()
-aStar()
-printResult()
+'''
