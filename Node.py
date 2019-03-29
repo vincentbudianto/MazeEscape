@@ -9,6 +9,3 @@ class Node():
 		self.prev = prev
 		self.pos = pos
 		self.f = 0
-
-	def __eq__(self, x):
-		return self.pos == x.pos

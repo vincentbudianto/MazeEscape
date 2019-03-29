@@ -101,13 +101,16 @@ def aStar():
 		openNode.remove(curr)
 		closedNode.append(curr)
 		
+		for i in range(len(closedNode)):
+			maps[closedNode[i].pos[0]][closedNode[i].pos[1]] = 3
+				
 		for move in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
 			nextNode = (curr.pos[0] + move[0], curr.pos[1] + move[1])
 			
 			if ((nextNode[0] > (len(maps) - 1)) or (nextNode[0] < 0) or (nextNode[1] > (len(maps[len(maps)-1]) -1)) or (nextNode[1] < 0)):
 				continue
 
-			if ((maps[nextNode[0]][nextNode[1]]) != 0):
+			if (maps[nextNode[0]][nextNode[1]] != 0):
 				continue
 			
 			if ((nextNode[0] == curr.pos[0]) and (nextNode[1] == curr.pos[1])):
@@ -116,9 +119,6 @@ def aStar():
 			newNode = Node(curr, nextNode)
 			adj.append(newNode)
 
-		for i in range(len(adj)):
-			maps[adj[i].pos[0]][adj[i].pos[1]] = 3
-		
 		for i in adj:
 			for j in closedNode:
 				if (i == j):
