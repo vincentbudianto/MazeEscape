@@ -6,18 +6,20 @@
 
 from Node import *
 from colorama import *
+from time import *
 import os
 import queue
 
 #inisialisasi variabel global
-global filename1
+global filename
+global defaultMaps
 global maps
 global startPos
 global endPos
 global path
 global openNode
 global closedNode
-global algotype
+global inputMenu
 
 #inisialisasi variabel
 startPos = Node(None, None)
@@ -48,6 +50,7 @@ def end():
 	
 def load():
 	global filename
+	global defaultMaps
 	global maps
 	
 	if (not('.txt' in filename)):
@@ -57,13 +60,16 @@ def load():
 	a = len(F)
 	b = len(F[0])
 	maps = [[0 for x in range (a)] for y in range(b)]
+	defaultMaps = [[0 for x in range (a)] for y in range(b)]
 	
 	for i in range(len(F)):
 		for j in range(len(F[i])):
 			if (F[i][j] == '1'):
 				maps[i][j] = 1
+				defaultMaps[i][j] = 1
 			else:
 				maps[i][j] = 0
+				defaultMaps[i][j] = 0
 	
 	end()
 	start()
@@ -182,10 +188,10 @@ def BFS():
 				if (i == j):
 					continue
 			
-			##i.f = curr.f - heu(curr) + heu(i) + 1 
+			i.f = curr.f + 1 
 			
 			for j in openNode:
-				if ((i == j)): #and (i.f > j.f)):
+				if ((i == j)and (i.f > j.f)):
 					continue
 			
 			openNode.append(i)
@@ -193,106 +199,160 @@ def BFS():
 def printMaze():
 	global maps
 	
-	print('Maze :')
+	print(Style.BRIGHT + 'Maze :')
 	print(end = ' ')
 	
 	for x in range(len(maps[len(maps) - 1]) + 4):
-		print(Back.WHITE + ' ', end = '')
+		print(Style.BRIGHT + Back.WHITE + ' ', end = '')
 
 	print()
 	
 	for i in range(len(maps)):
 		print(' ', end = '')
-		print(Back.WHITE + '  ', end = '')
+		print(Style.BRIGHT + Back.WHITE + '  ', end = '')
 		
 		for j in range(len(maps[i])):
 			if ((i == startPos.pos[0]) and (j == startPos.pos[1])):
-				print(Back.CYAN + ' ', end = '')
+				print(Style.BRIGHT + Back.CYAN + ' ', end = '')
 			elif ((i == endPos.pos[0]) and (j == endPos.pos[1])):
-				print(Back.CYAN + ' ', end = '')
+				print(Style.BRIGHT + Back.CYAN + ' ', end = '')
 			elif (maps[i][j] == 1):
-				print(Back.BLACK + ' ', end = '')
+				print(Style.BRIGHT + Back.BLACK + ' ', end = '')
 			elif (maps[i][j] == 0):
-				print(Back.WHITE + ' ', end = '')
+				print(Style.BRIGHT + Back.WHITE + ' ', end = '')
 			
 			if (j == (len(maps[i]) - 1)):
-				print(Back.WHITE + '  ')
+				print(Style.BRIGHT + Back.WHITE + '  ')
 
 	print(' ', end = '')
 
 	for x in range(len(maps[len(maps) - 1]) + 4):
-		print(Back.WHITE + ' ', end = '')
+		print(Style.BRIGHT + Back.WHITE + ' ', end = '')
 
 	print()
 
 def printResult():
 	global maps
 	
-	print('Result:')
+	print(Style.BRIGHT + 'Result:')
 	print(end = ' ')
 	
 	for x in range(len(maps[len(maps) - 1]) + 4):
-		print(Back.WHITE + ' ', end = '')
+		print(Style.BRIGHT + Back.WHITE + ' ', end = '')
 
 	print()
 	
 	for i in range(len(maps)):
 		print(' ', end = '')
-		print(Back.WHITE + '  ', end = '')
+		print(Style.BRIGHT + Back.WHITE + '  ', end = '')
 		
 		for j in range(len(maps[i])):
 			if (maps[i][j] == 3):
-				print(Back.RED + ' ', end = '')
+				print(Style.BRIGHT + Back.RED + ' ', end = '')
 			elif (maps[i][j] == 2):
-				print(Back.GREEN + ' ', end = '')
+				print(Style.BRIGHT + Back.GREEN + ' ', end = '')
 			elif (maps[i][j] == 1):
-				print(Back.BLACK + ' ', end = '')
+				print(Style.BRIGHT + Back.BLACK + ' ', end = '')
 			elif (maps[i][j] == 0):
-				print(Back.WHITE + ' ', end = '')
+				print(Style.BRIGHT + Back.WHITE + ' ', end = '')
 			
 			if (j == (len(maps[i]) - 1)):
-				print(Back.WHITE + '  ')
+				print(Style.BRIGHT + Back.WHITE + '  ')
 
 	print(' ', end = '')
 
 	for x in range(len(maps[len(maps) - 1]) + 4):
-		print(Back.WHITE + ' ', end = '')
+		print(Style.BRIGHT + Back.WHITE + ' ', end = '')
 	
 	print()
 
+def reset():
+	global maps
+	global path
+	global openNode
+	global closedNode
+	
+	path.clear()
+	openNode.clear()
+	closedNode.clear()
+	
+	for i in range(len(maps)):
+		for j in range(len(maps[i])):
+			maps[i][j] = defaultMaps[i][j]
+
+#Program Utama
 init(autoreset=True)
+inputMenu = 0
 valid = False
 
 while (not valid):
 	try:
-		filename = input('Masukan nama file : ')
-		valid = True
 		os.system('cls')
-	except IOError:
-		print(filename, 'Not Found')
 
-load()
-printMaze()
-valid = False
-while (not valid):
-	try:
-		algotype = input('Masukan jenis algoritma (A untuk AStar, B untuk BFS): ')
-		
+		print(Style.BRIGHT + Fore.MAGENTA + '________________________________________________________________________\n|  ', end = '')
+		print(Style.BRIGHT + Fore.CYAN + ' __  __                     ______                               ', end = '')
+		print(Style.BRIGHT + Fore.MAGENTA + '   |\n|  ', end = '')
+		print(Style.BRIGHT + Fore.CYAN + '|  \\/  |                   |  ____|                              ', end = '')
+		print(Style.BRIGHT + Fore.MAGENTA + '   |\n|  ', end = '')
+		print(Style.BRIGHT + Fore.CYAN + '| \\  / |  __ _  ____  ___  | |__    ___   ___   __ _  _ __    ___ ', end = '')
+		print(Style.BRIGHT + Fore.MAGENTA + '  |\n|  ', end = '')
+		print(Style.BRIGHT + Fore.CYAN + '| |\\/| | / _` ||_  / / _ \ |  __|  / __| / __| / _` || \'_ \\  / _ \\', end = '')
+		print(Style.BRIGHT + Fore.MAGENTA + '  |\n|  ', end = '')
+		print(Style.BRIGHT + Fore.CYAN + '| |  | || (_| | / / |  __/ | |____ \\__ \\| (__ | (_| || |_) ||  __/', end = '')
+		print(Style.BRIGHT + Fore.MAGENTA + '  |\n|  ', end = '')
+		print(Style.BRIGHT + Fore.CYAN + '|_|  |_| \\__,_|/___| \\___| |______||___/ \\___| \\__,_|| .__/  \\___|', end = '')
+		print(Style.BRIGHT + Fore.MAGENTA + '  |\n|  ', end = '')
+		print(Style.BRIGHT + Fore.CYAN + '                                                     | |          ', end = '')
+		print(Style.BRIGHT + Fore.MAGENTA + '  |\n|  ', end = '')
+		print(Style.BRIGHT + Fore.CYAN + '                                                     |_|          ', end = '')
+		print(Style.BRIGHT + Fore.MAGENTA + '  |')
+		print(Style.BRIGHT + Fore.MAGENTA + '|______________________________________________________________________|\n')
+
+		filename = input(Style.BRIGHT + Fore.YELLOW + 'Masukan nama file : ')
+		load()
 		valid = True
-	except IOError:
-		print("Wrong input.")
-if (algotype == "B"):
-	BFS()
-elif (algotype == "A"):
-	aStar()
-os.system('cls')
-printResult()
+	except:
+		print(Style.BRIGHT + Fore.RED + filename + ' Not Found')
+		sleep(1)
 
-''' Driver:
-for i in range(len(maps)):
-	print(i, end = ': ')
-	print(maps[i])
+while (inputMenu != 4):
+	os.system('cls')
+	valid = False
+	printMaze()
+	
+	while (not valid):
+		try:
+			print()
+			print(Style.BRIGHT + 'Menu :')
+			print(Style.BRIGHT + '1. Algoritma BFS')
+			print(Style.BRIGHT + '2. Algoritma A*')
+			print(Style.BRIGHT + '3. Change File')
+			print(Style.BRIGHT + '4. Exit')
+			inputMenu = input(Style.BRIGHT + Fore.CYAN + '\nMasukan jenis algoritma: ')		
+			valid = True
+		except IOError:
+			print(Style.BRIGHT + Fore.RED + 'Invalid input.')
+			sleep(1)
 
-print('start :', startPos.pos)
-print('end   :',endPos.pos)
-'''
+	if (inputMenu == '1'):
+		BFS()
+		os.system('cls')
+		printResult()
+		reset()
+		input(Style.BRIGHT + Fore.BLUE + '\n--- CONTINUE ---')
+	elif (inputMenu == '2'):
+		aStar()
+		os.system('cls')
+		printResult()
+		reset()
+		input(Style.BRIGHT + Fore.BLUE + '\n--- CONTINUE ---')
+	elif (inputMenu == '3'):
+		try:
+			filename = input(Style.BRIGHT + Fore.YELLOW + '\nMasukan nama file : ')
+			load()
+			valid = True
+		except:
+			print(Style.BRIGHT + Fore.RED + filename + ' Not Found')
+			sleep(0.8)
+	elif (inputMenu == '4'):
+		exit()
