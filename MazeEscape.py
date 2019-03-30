@@ -16,11 +16,12 @@ global maps
 global startPos
 global endPos
 global path
-global openNode
-global closedNode
+global liveNode
+global deadNode
 global inputMenu
 
 class Node():
+	#Ctor
 	def __init__(self, prev=None, pos=None):
 		self.prev = prev
 		self.pos = pos
@@ -30,12 +31,14 @@ class Node():
 startPos = Node(None, None)
 endPos = Node(None, None)
 path = []
-openNode = []
-closedNode = []
+liveNode = []
+deadNode = []
 
 def start():
+	#Kamus
 	global startPos
 
+	#Algoritma
 	for i in range(len(maps)):
 		if (maps[i][0] == 0):
 			s = (i, 0)
@@ -44,8 +47,10 @@ def start():
 	startPos.f = heu(startPos)
 
 def end():
+	#Kamus
 	global endPos
 	
+	#Algoritma
 	for i in range(len(maps)):
 		if (maps[i][len(maps[i]) - 1] == 0):
 			e = (i, len(maps[i]) - 1)
@@ -54,16 +59,19 @@ def end():
 	endPos.f = heu(endPos)
 
 def heu(x):
+	#Algoritma
 	a = endPos.pos[0] - x.pos[0]
 	b = endPos.pos[1] - x.pos[1]
 
 	return abs(a + b)
 	
 def load():
+	#Kamus
 	global filename
 	global defaultMaps
 	global maps
 	
+	#Algoritma
 	if (not('.txt' in filename)):
 		filename += '.txt'
 	
@@ -86,17 +94,19 @@ def load():
 	start()
 
 def aStar():
+	#Kamus
 	global maps
 	global path
-	global openNode
-	global closedNode
+	global liveNode
+	global deadNode
 
+	#Algoritma
 	curr = startPos
-	openNode.append(curr)
+	liveNode.append(curr)
 
-	while openNode:
+	while liveNode:
 		adj = []
-		curr = min(openNode, key = lambda n:n.f)
+		curr = min(liveNode, key = lambda n:n.f)
 	
 		if ((curr.pos[0] == endPos.pos[0]) and (curr.pos[1] == endPos.pos[1])):
 			while curr.prev:
@@ -110,11 +120,11 @@ def aStar():
 			
 			break
 		
-		openNode.remove(curr)
-		closedNode.append(curr)
+		liveNode.remove(curr)
+		deadNode.append(curr)
 		
-		for i in range(len(closedNode)):
-			maps[closedNode[i].pos[0]][closedNode[i].pos[1]] = 3
+		for i in range(len(deadNode)):
+			maps[deadNode[i].pos[0]][deadNode[i].pos[1]] = 3
 				
 		for move in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
 			nextNode = (curr.pos[0] + move[0], curr.pos[1] + move[1])
@@ -132,30 +142,32 @@ def aStar():
 			adj.append(newNode)
 
 		for i in adj:
-			for j in closedNode:
+			for j in deadNode:
 				if (i == j):
 					continue
 			
 			i.f = curr.f - heu(curr) + heu(i) + 1 
 			
-			for j in openNode:
+			for j in liveNode:
 				if ((i == j) and (i.f > j.f)):
 					continue
 			
-			openNode.append(i)
+			liveNode.append(i)
 
 def BFS():
+	#Kamus
 	global maps
 	global path
-	global openNode
-	global closedNode
+	global liveNode
+	global deadNode
 
+	#Algoritma
 	curr = startPos
-	openNode.append(curr)
+	liveNode.append(curr)
 
-	while openNode:
+	while liveNode:
 		adj = []
-		curr = min(openNode, key = lambda n:n.f)
+		curr = min(liveNode, key = lambda n:n.f)
 		if ((curr.pos[0] == endPos.pos[0]) and (curr.pos[1] == endPos.pos[1])):
 			while curr.prev:
 				path.append(curr)
@@ -166,11 +178,11 @@ def BFS():
 			
 			break
 			
-		openNode.remove(curr)
-		closedNode.append(curr)
+		liveNode.remove(curr)
+		deadNode.append(curr)
 		
-		for i in range(len(closedNode)):
-			maps[closedNode[i].pos[0]][closedNode[i].pos[1]] = 3
+		for i in range(len(deadNode)):
+			maps[deadNode[i].pos[0]][deadNode[i].pos[1]] = 3
 				
 		for move in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
 			nextNode = (curr.pos[0] + move[0], curr.pos[1] + move[1])
@@ -188,21 +200,23 @@ def BFS():
 			adj.append(newNode)
 
 		for i in adj:
-			for j in closedNode:
+			for j in deadNode:
 				if (i == j):
 					continue
 			
 			i.f = curr.f + 1 
 			
-			for j in openNode:
+			for j in liveNode:
 				if ((i == j)and (i.f > j.f)):
 					continue
 			
-			openNode.append(i)
+			liveNode.append(i)
 
 def printMaze():
+	#Kamus
 	global maps
 	
+	#Algoritma
 	print(Style.BRIGHT + 'Maze :')
 	print(end = ' ')
 	
@@ -236,8 +250,10 @@ def printMaze():
 	print()
 
 def printResult():
+	#Kamus
 	global maps
 	
+	#Algoritma
 	print(Style.BRIGHT + 'Result:')
 	print(end = ' ')
 	
@@ -271,14 +287,16 @@ def printResult():
 	print()
 
 def reset():
+	#Kamus
 	global maps
 	global path
-	global openNode
-	global closedNode
+	global liveNode
+	global deadNode
 	
+	#Algoritma
 	path.clear()
-	openNode.clear()
-	closedNode.clear()
+	liveNode.clear()
+	deadNode.clear()
 	
 	for i in range(len(maps)):
 		for j in range(len(maps[i])):
