@@ -17,6 +17,7 @@ global endPos
 global path
 global openNode
 global closedNode
+global algotype
 
 #inisialisasi variabel
 startPos = Node(None, None)
@@ -132,6 +133,63 @@ def aStar():
 			
 			openNode.append(i)
 
+def BFS():
+	global maps
+	global path
+	global openNode
+	global closedNode
+
+	#Insialisasi Simpul Awal ke Queue
+	curr = startPos
+	openNode.append(curr)
+
+	while openNode:
+		adj = []
+		curr = min(openNode, key = lambda n:n.f)
+		if ((curr.pos[0] == endPos.pos[0]) and (curr.pos[1] == endPos.pos[1])):
+			while curr.prev:
+				path.append(curr)
+				curr = curr.prev
+			path.append(curr)
+			for i in range(len(path)):
+				maps[path[i].pos[0]][path[i].pos[1]] = 2
+			
+			break
+			
+		openNode.remove(curr)
+		closedNode.append(curr)
+		
+		for i in range(len(closedNode)):
+			maps[closedNode[i].pos[0]][closedNode[i].pos[1]] = 3
+				
+		for move in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+			nextNode = (curr.pos[0] + move[0], curr.pos[1] + move[1])
+			
+			if ((nextNode[0] > (len(maps) - 1)) or (nextNode[0] < 0) or (nextNode[1] > (len(maps[len(maps)-1]) -1)) or (nextNode[1] < 0)):
+				continue
+
+			if (maps[nextNode[0]][nextNode[1]] != 0):
+				continue
+			
+			if ((nextNode[0] == curr.pos[0]) and (nextNode[1] == curr.pos[1])):
+				continue
+			
+			newNode = Node(curr, nextNode)
+			adj.append(newNode)
+
+		for i in adj:
+			for j in closedNode:
+				if (i == j):
+					continue
+			
+			##i.f = curr.f - heu(curr) + heu(i) + 1 
+			
+			for j in openNode:
+				if ((i == j)): #and (i.f > j.f)):
+					continue
+			
+			openNode.append(i)
+
 def printMaze():
 	global maps
 	
@@ -215,8 +273,18 @@ while (not valid):
 
 load()
 printMaze()
-aStar()
-input()
+valid = False
+while (not valid):
+	try:
+		algotype = input('Masukan jenis algoritma (A untuk AStar, B untuk BFS): ')
+		
+		valid = True
+	except IOError:
+		print("Wrong input.")
+if (algotype == "B"):
+	BFS()
+elif (algotype == "A"):
+	aStar()
 os.system('cls')
 printResult()
 
