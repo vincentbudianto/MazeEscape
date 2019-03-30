@@ -168,11 +168,14 @@ def BFS():
 	while liveNode:
 		adj = []
 		curr = min(liveNode, key = lambda n:n.f)
+
 		if ((curr.pos[0] == endPos.pos[0]) and (curr.pos[1] == endPos.pos[1])):
 			while curr.prev:
 				path.append(curr)
 				curr = curr.prev
+
 			path.append(curr)
+
 			for i in range(len(path)):
 				maps[path[i].pos[0]][path[i].pos[1]] = 2
 			
