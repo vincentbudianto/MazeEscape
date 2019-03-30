@@ -4,7 +4,6 @@
 	Tanggal   : 01 April 2019
 	Deskripsi : Source code  menggunakan strategi algoritma BFS dan A* '''
 
-from Node import *
 from colorama import *
 from time import *
 import os
@@ -20,6 +19,12 @@ global path
 global openNode
 global closedNode
 global inputMenu
+
+class Node():
+	def __init__(self, prev=None, pos=None):
+		self.prev = prev
+		self.pos = pos
+		self.f = 0
 
 #inisialisasi variabel
 startPos = Node(None, None)
@@ -47,6 +52,12 @@ def end():
 
 	endPos = Node(None, e)
 	endPos.f = heu(endPos)
+
+def heu(x):
+	a = endPos.pos[0] - x.pos[0]
+	b = endPos.pos[1] - x.pos[1]
+
+	return abs(a + b)
 	
 def load():
 	global filename
@@ -73,12 +84,6 @@ def load():
 	
 	end()
 	start()
-
-def heu(x):
-	a = endPos.pos[0] - x.pos[0]
-	b = endPos.pos[1] - x.pos[1]
-
-	return abs(a + b)
 
 def aStar():
 	global maps
@@ -145,7 +150,6 @@ def BFS():
 	global openNode
 	global closedNode
 
-	#Insialisasi Simpul Awal ke Queue
 	curr = startPos
 	openNode.append(curr)
 
